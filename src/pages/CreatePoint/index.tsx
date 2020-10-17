@@ -1,5 +1,11 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import { LeafletMouseEvent } from 'leaflet';
@@ -47,6 +53,8 @@ const CreatePoint: React.FC = () => {
     0,
     0,
   ]);
+
+  const history = useHistory();
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(position => {
@@ -123,9 +131,54 @@ const CreatePoint: React.FC = () => {
 
   const handleSelectItem = useCallback(
     (id: number) => {
-      setSelectedItems([...selectedItems, id]);
+      const alreadySelected = selectedItems.findIndex(item => item === id);
+
+      if (alreadySelected >= 0) {
+        const filteredItems = selectedItems.filter(item => item !== id);
+
+        setSelectedItems(filteredItems);
+      } else {
+        setSelectedItems([...selectedItems, id]);
+      }
     },
     [selectedItems],
+  );
+
+  const handleSubmit = useCallback(
+    async (event: FormEvent) => {
+      event.preventDefault();
+
+      const { name, email, whatsapp } = formData;
+      const uf = selectedUf;
+      const city = selectedCity;
+      const [latitude, longitude] = selectedPosition;
+      const itemsSelected = selectedItems;
+
+      const data = {
+        name,
+        email,
+        whatsapp,
+        uf,
+        city,
+        latitude,
+        longitude,
+        items: itemsSelected,
+      };
+
+      await api.post('points', data);
+
+      alert('Ponto de coleta criado com sucesso!');
+
+      history.push('/');
+    },
+    [
+      formData,
+      history,
+      selectedCity,
+      selectedItems,
+      selectedPosition,
+      selectedUf,
+    ],
   );
 
   return (
@@ -139,7 +192,7 @@ const CreatePoint: React.FC = () => {
         </Link>
       </header>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <h1>
           Cadastro do <br /> ponto de coleta
         </h1>
