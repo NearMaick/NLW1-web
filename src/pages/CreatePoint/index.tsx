@@ -8,6 +8,7 @@ import api from '../../services/api';
 import './styles.css';
 
 import logo from '../../assets/logo.svg';
+import { LeafletMouseEvent } from 'leaflet';
 
 interface ItemProps {
   id: number;
@@ -28,8 +29,25 @@ const CreatePoint: React.FC = () => {
   const [ufs, setUfs] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
 
+  const [initialPosition, setInitalPosition] = useState<[number, number]>([
+    0,
+    0,
+  ]);
+
   const [selectedUf, setSelectedUf] = useState('0');
   const [selectedCity, setSelectedCity] = useState('0');
+  const [selectedPosition, setSelectedPosition] = useState<[number, number]>([
+    0,
+    0,
+  ]);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(position => {
+      const { latitude, longitude } = position.coords;
+
+      setInitalPosition([latitude, longitude]);
+    });
+  }, []);
 
   useEffect(() => {
     api.get('items').then(response => {
@@ -83,6 +101,10 @@ const CreatePoint: React.FC = () => {
     [],
   );
 
+  const handleMapClick = useCallback((event: LeafletMouseEvent) => {
+    setSelectedPosition([event.latlng.lat, event.latlng.lng]);
+  }, []);
+
   return (
     <div id="page-create-point">
       <header>
@@ -128,13 +150,13 @@ const CreatePoint: React.FC = () => {
             <span>Selecione o endereço no mapa</span>
           </legend>
 
-          <Map center={[-27.2092052, -49.6401092]} zoom={15}>
+          <Map center={initialPosition} zoom={15} onClick={handleMapClick}>
             <TileLayer
               attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            <Marker position={[-27.2092052, -49.6401092]} />
+            <Marker position={selectedPosition} />
           </Map>
 
           <div className="field-group">
