@@ -1,13 +1,9 @@
 import React from 'react';
 import './App.css';
+import Home from './pages/Home';
 
 const App: React.FC = () => {
-  // parei aqui 38'00
-  return (
-    <div>
-      <h1>Maick Souza</h1>
-    </div>
-  );
+  return <Home />;
 };
 
 export default App;
