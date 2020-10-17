@@ -19,9 +19,14 @@ interface IBGEUFResponse {
   sigla: string;
 }
 
+interface IBGECityResponse {
+  nome: string;
+}
+
 const CreatePoint: React.FC = () => {
   const [items, setItems] = useState<ItemProps[]>([]);
   const [ufs, setUfs] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
 
   const [selectedUf, setSelectedUf] = useState('0');
 
@@ -44,7 +49,19 @@ const CreatePoint: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log('mudou', selectedUf);
+    if (selectedUf === '0') {
+      return;
+    }
+
+    axios
+      .get<IBGECityResponse[]>(
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`,
+      )
+      .then(response => {
+        const cityNames = response.data.map(city => city.nome);
+
+        setCities(cityNames);
+      });
   }, [selectedUf]);
 
   const handleSelectUf = useCallback(
@@ -131,7 +148,11 @@ const CreatePoint: React.FC = () => {
             <div className="field">
               <label htmlFor="city">Cidade</label>
               <select name="city" id="city">
-                <option value="0">Selecione uma cidade</option>
+                {cities.map(city => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
