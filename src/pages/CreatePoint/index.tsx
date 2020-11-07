@@ -151,32 +151,42 @@ const CreatePoint: React.FC = () => {
     async (event: FormEvent) => {
       event.preventDefault();
 
-      console.log(selectedFile);
+      const { name, email, whatsapp } = formData;
+      const uf = selectedUf;
+      const city = selectedCity;
+      const [latitude, longitude] = selectedPosition;
+      const itemsSelected = selectedItems;
 
-      // const { name, email, whatsapp } = formData;
-      // const uf = selectedUf;
-      // const city = selectedCity;
-      // const [latitude, longitude] = selectedPosition;
-      // const itemsSelected = selectedItems;
+      const data = new FormData();
 
-      // const data = {
-      //   name,
-      //   email,
-      //   whatsapp,
-      //   uf,
-      //   city,
-      //   latitude,
-      //   longitude,
-      //   items: itemsSelected,
-      // };
+      data.append('name', name);
+      data.append('email', email);
+      data.append('whatsapp', whatsapp);
+      data.append('uf', uf);
+      data.append('city', city);
+      data.append('latitude', String(latitude));
+      data.append('longitude', String(longitude));
+      data.append('items', itemsSelected.join(','));
 
-      // await api.post('points', data);
+      if (selectedFile) {
+        data.append('image', selectedFile);
+      }
 
-      // alert('Ponto de coleta criado com sucesso!');
+      await api.post('points', data);
 
-      // history.push('/');
+      alert('Ponto de coleta criado com sucesso!');
+
+      history.push('/');
     },
-    [selectedFile],
+    [
+      formData,
+      history,
+      selectedCity,
+      selectedFile,
+      selectedItems,
+      selectedPosition,
+      selectedUf,
+    ],
   );
 
   return (
