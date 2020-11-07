@@ -55,6 +55,7 @@ const CreatePoint: React.FC = () => {
     0,
     0,
   ]);
+  const [selectedFile, setSelectedFile] = useState<File>();
 
   const history = useHistory();
 
@@ -150,37 +151,32 @@ const CreatePoint: React.FC = () => {
     async (event: FormEvent) => {
       event.preventDefault();
 
-      const { name, email, whatsapp } = formData;
-      const uf = selectedUf;
-      const city = selectedCity;
-      const [latitude, longitude] = selectedPosition;
-      const itemsSelected = selectedItems;
+      console.log(selectedFile);
 
-      const data = {
-        name,
-        email,
-        whatsapp,
-        uf,
-        city,
-        latitude,
-        longitude,
-        items: itemsSelected,
-      };
+      // const { name, email, whatsapp } = formData;
+      // const uf = selectedUf;
+      // const city = selectedCity;
+      // const [latitude, longitude] = selectedPosition;
+      // const itemsSelected = selectedItems;
 
-      await api.post('points', data);
+      // const data = {
+      //   name,
+      //   email,
+      //   whatsapp,
+      //   uf,
+      //   city,
+      //   latitude,
+      //   longitude,
+      //   items: itemsSelected,
+      // };
 
-      alert('Ponto de coleta criado com sucesso!');
+      // await api.post('points', data);
 
-      history.push('/');
+      // alert('Ponto de coleta criado com sucesso!');
+
+      // history.push('/');
     },
-    [
-      formData,
-      history,
-      selectedCity,
-      selectedItems,
-      selectedPosition,
-      selectedUf,
-    ],
+    [selectedFile],
   );
 
   return (
@@ -199,7 +195,7 @@ const CreatePoint: React.FC = () => {
           Cadastro do <br /> ponto de coleta
         </h1>
 
-        <DropZone />
+        <DropZone onFileUploded={setSelectedFile} />
 
         <fieldset>
           <legend>
